@@ -15,7 +15,7 @@ import java.net.Socket;
 @Component
 public class ServerThread extends Thread {
 
-    Socket socket;
+    private Socket socket;
 
     ServerThread() {
     }
