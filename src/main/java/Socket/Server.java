@@ -1,46 +1,30 @@
 package Socket;
 
-/*
- * Author: Arturs Kuzmiks
- */
 
-import java.io.BufferedReader;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8080);
+@Component
+class Server {
 
-        Thread tr = new Thread(() -> {
+    private static final int PORT = 8080;
 
-            try (
-                    Socket clientSocket = serverSocket.accept();
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
-            ) {
+    void serverRun() throws IOException {
+        new Server().runServer();
 
-                System.out.println("New connection from: " + clientSocket.getRemoteSocketAddress().toString());
-
-                String str;
-
-                while ((str = in.readLine()) != null) {
-                    System.out.println("Have read from client: " + str);
-                    out.println(Integer.parseInt(str) + 1);
-                    System.out.println("Have wrote to client: " + (Integer.parseInt(str) + 1));
-                }
-
-                System.out.println("Client has disconnected");
-
-            } catch (Throwable cause) {
-                System.out.println("connection error: " + cause.getMessage());
-            }
-
-        });
-
-        tr.start();
     }
+
+    private void runServer() throws IOException {
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        System.out.println("Server uo & ready for connections...");
+
+        do {
+            Socket clientSocket = serverSocket.accept();
+            new ServerThread(clientSocket).start();
+        } while (true);
+    }
+
 }
